@@ -1,8 +1,8 @@
 use <kumiko.scad>
 
 // Dimensions
-width = 175;
-height = 46.6;
+width = 176;
+height = 45.6;
 thickness = 10;
 frame_thickness = 4;
 angle = 15;
@@ -21,7 +21,7 @@ m3_hole_offset_y = 16.5;
 
 //stands parameters
 stand_thiskness = frame_thickness; // thickness of the stand
-extra_stand_elevation = 5;
+extra_stand_elevation = 6;
 back_stand_width = 50;
 back_stand_height = sin(angle) * width + extra_stand_elevation; // height of the back stand
 back_stand_x_offset = sin(angle) * stand_thiskness;
@@ -58,11 +58,17 @@ module whole_emptiness() {
     // The shape to be cut out from the frame
     union() {
         plain_frame_emptiness();
+        // Jumper to cut out the frame stands from the back
         x_length_to_cut = back_stand_width - stand_thiskness * 2; // length of the cut in the frame
         translate([width - x_length_to_cut - stand_thiskness, 0, 0]) {
             cube([x_length_to_cut, frame_thickness, thickness]); // to ensure the cut goes through
         }
         frame_back_stand_emptiness();
+
+        x_length_to_cut_front = front_stand_width - stand_thiskness * 2; // length of the cut in the frame
+        translate([stand_thiskness, 1, 0]) {
+            cube([front_stand_width -1.967*stand_thiskness, frame_thickness, thickness]); // to ensure the cut goes through
+        }
         frame_front_stand_emptiness();
     }
 }
@@ -90,7 +96,7 @@ module frame_front_stand() {
 }
 
 module frame_front_stand_emptiness() {
-    translate([width - front_stand_width + stand_thiskness, -front_stand_height + stand_thiskness, 0]) {
+    translate([stand_thiskness, -front_stand_height + stand_thiskness, 0]) {
         rotate_about_pt(-angle,0,[front_stand_width - stand_thiskness,front_stand_height - stand_thiskness,thickness])
             cube([front_stand_width -2*stand_thiskness, front_stand_height - stand_thiskness, thickness]);                     
     }
@@ -129,7 +135,7 @@ module screw_holders_holes() {
 module asanoha_pattern_with_scre_holes () {
        difference() {
             whole_emptiness();
-            translate([-2, -40, 0])
+            translate([1, -54, 0])
                 linear_extrude(height = thickness)  // 2 units deep cut
                     asanoha(cellSize=16.65, widthInCells=15, heightInCells=16, strength=1.5, fillingStrength=2);
             screw_holders_holes();
@@ -151,6 +157,3 @@ module rotate_about_pt(z, y, pt) {
             translate(-pt)
                 children();   
 }
-
-
-
