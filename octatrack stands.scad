@@ -1,4 +1,4 @@
-a>euse <kumiko.scad>
+use <kumiko.scad>
 
 // Dimensions
 width = 175;
