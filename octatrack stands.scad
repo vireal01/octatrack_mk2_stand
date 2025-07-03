@@ -1,38 +1,34 @@
-use <kumiko.scad>
+a>euse <kumiko.scad>
 
 // Dimensions
 width = 175;
 height = 46.6;
-thickness = 8;
+thickness = 10;
 frame_thickness = 4;
 angle = 15;
 
 // M3 screw holder parameters
 m3_hole_diameter = 3;
 m3_head_diameter = 6;
-m3_holder_extra_thickness = 2;
+m3_holder_extra_thickness = 3;
 m3_holder_diameter = m3_head_diameter + m3_holder_extra_thickness;
 m3_holder_radius = m3_holder_diameter / 2;
 m3_hole_radius = m3_hole_diameter / 2;
 m3_head_radius = m3_head_diameter / 2;
-m3_head_holder_thickness = 3;
+m3_head_holder_thickness = 5;
 m3_hole_offset_x = 30;
 m3_hole_offset_y = 16.5;
 
 //stands parameters
 stand_thiskness = frame_thickness; // thickness of the stand
-
+extra_stand_elevation = 5;
 back_stand_width = 50;
-back_stand_height = sin(angle) * width;
+back_stand_height = sin(angle) * width + extra_stand_elevation; // height of the back stand
 back_stand_x_offset = sin(angle) * stand_thiskness;
 
-// Reference point for the panel
-back_stand_top_right_x =  width;
-back_stand_top_right_y =  0;
-back_stand_base_right_x =  -back_stand_height;
-back_stand_base_right_y =  -back_stand_height;
-
-
+front_stand_width = 15;
+front_stand_height = sin(angle) * front_stand_width + extra_stand_elevation;
+front_stand_x_offset = sin(angle) * stand_thiskness;
 
 
 // === MODULE: design the panel flat ===
@@ -49,6 +45,7 @@ module plain_frame() {
     // Frame plate with hollow center
    cube([width, height, thickness]);
    frame_back_stand();
+   frame_front_stand();
 }
 
 module plain_frame_emptiness() {
@@ -66,6 +63,7 @@ module whole_emptiness() {
             cube([x_length_to_cut, frame_thickness, thickness]); // to ensure the cut goes through
         }
         frame_back_stand_emptiness();
+        frame_front_stand_emptiness();
     }
 }
 
@@ -85,6 +83,18 @@ module frame_back_stand_emptiness() {
     }
 }
 
+module frame_front_stand() {
+    translate([0, -front_stand_height, 0]) {
+        rotate_about_pt(-angle,0,[front_stand_width,front_stand_height,thickness]) cube([front_stand_width, front_stand_height, thickness]);                     
+    }
+}
+
+module frame_front_stand_emptiness() {
+    translate([width - front_stand_width + stand_thiskness, -front_stand_height + stand_thiskness, 0]) {
+        rotate_about_pt(-angle,0,[front_stand_width - stand_thiskness,front_stand_height - stand_thiskness,thickness])
+            cube([front_stand_width -2*stand_thiskness, front_stand_height - stand_thiskness, thickness]);                     
+    }
+}
 
 
 // === MODULE: design the screw holders ===
@@ -117,17 +127,6 @@ module screw_holders_holes() {
 
 // === MODULE: design the asanoha pattern with screw holes ===
 module asanoha_pattern_with_scre_holes () {
-    // difference(){
-    //   translate([frame_thickness, frame_thickness, 0])
-    //     difference() {
-    //         whole_emptiness();
-    //         translate([-2, -25, 0])
-    //             linear_extrude(height = thickness)  // 2 units deep cut
-    //                 asanoha(cellSize=16.65, widthInCells=15, heightInCells=16, strength=1.5, fillingStrength=2);  
-           
-    //     }
-    //   screw_holders_holes();
-
        difference() {
             whole_emptiness();
             translate([-2, -40, 0])
@@ -135,21 +134,17 @@ module asanoha_pattern_with_scre_holes () {
                     asanoha(cellSize=16.65, widthInCells=15, heightInCells=16, strength=1.5, fillingStrength=2);
             screw_holders_holes();
        }
-    //}
 }
 
 // Final placement: rotate the entire part
-rotate([0, 0, 0]) { // rotate around X to stand it up
-        //intersection() {
+rotate([0, 0, angle]) { // rotate around X to stand it up
         base_frame();
         asanoha_pattern_with_scre_holes();
         screw_holders();
 }
 
 
-
 // Helpers
-
 module rotate_about_pt(z, y, pt) {
     translate(pt)
         rotate([0, y, z]) // CHANGE HERE
