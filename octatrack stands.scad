@@ -8,8 +8,8 @@ frame_thickness = 4;
 angle = 15;
 
 // M3 screw holder parameters
-m3_hole_diameter = 3;
-m3_head_diameter = 6;
+m3_hole_diameter = 3.4; // added .4 to the original 3mm to ensure a snug fit
+m3_head_diameter = 6.4; // added .4 to the original 6mm to ensure a snug fit
 m3_holder_extra_thickness = 3;
 m3_holder_diameter = m3_head_diameter + m3_holder_extra_thickness;
 m3_holder_radius = m3_holder_diameter / 2;
